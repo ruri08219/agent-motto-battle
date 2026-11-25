@@ -44,7 +44,15 @@ def main() -> int:
     out_path = os.path.join(out_dir, "entry.txt")
     with open(out_path, "w", encoding="utf-8") as f:
         f.write(text)
-    print("wrote %s (%d characters)" % (out_path, len(text)))
+    # Round-trip verification: the gate reads exactly what we wrote, so
+    # re-read the file and refuse to report success on any mismatch.
+    with open(out_path, "r", encoding="utf-8") as f:
+        written = f.read()
+    if written != text:
+        print("entry.txt round-trip mismatch", file=sys.stderr)
+        return 1
+    words = len(text.split())
+    print("wrote %s (%d characters, %d words)" % (out_path, len(text), words))
     return 0
 
 
